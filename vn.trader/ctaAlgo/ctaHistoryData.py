@@ -352,10 +352,13 @@ def loadMcCsv(fileName, dbName, symbol):
 
 if __name__ == '__main__':
     ## 简单的测试脚本可以写在这里
-    #from time import sleep
-    #e = HistoryDataEngine()
-    #sleep(1)
-    #e.downloadEquityDailyBar('000001')
-    
+    from time import sleep
+    e = HistoryDataEngine()
+    sleep(1)
+    # e.downloadEquityDailyBar('000001')
+    # e.downloadFuturesSymbol()
+    # e.downloadFuturesDailyBar(symbol="a1605")
+    e.downloadFuturesIntradayBar(symbol="IF1506")
     # 这里将项目中包含的股指日内分钟线csv导入MongoDB，作者电脑耗时大约3分钟
-    loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
+    # loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
+

@@ -119,26 +119,26 @@ class DrEngineManager(QtGui.QWidget):
     def updateSetting(self):
         """显示引擎行情记录配置"""
         with open(self.drEngine.settingFileName) as f:
-            drSetting = json.load(f)
+            setting = json.load(f)
     
-            if 'tick' in drSetting:
-                l = drSetting['tick']
+            if 'tick' in setting:
+                l = setting['tick']
     
-                for setting in l:
+                for symbol, gatewayName in l:
                     self.tickTable.insertRow(0)
-                    self.tickTable.setItem(0, 0, TableCell(setting[0]))
-                    self.tickTable.setItem(0, 1, TableCell(setting[1]))
+                    self.tickTable.setItem(0, 0, TableCell(symbol))
+                    self.tickTable.setItem(0, 1, TableCell(gatewayName))
     
-            if 'bar' in drSetting:
-                l = drSetting['bar']
+            if 'bar' in setting:
+                l = setting['bar']
     
-                for setting in l:
+                for symbol, gatewayName in l:
                     self.barTable.insertRow(0)
-                    self.barTable.setItem(0, 0, TableCell(setting[0]))
-                    self.barTable.setItem(0, 1, TableCell(setting[1])) 
+                    self.barTable.setItem(0, 0, TableCell(symbol))
+                    self.barTable.setItem(0, 1, TableCell(gatewayName)) 
     
-            if 'active' in drSetting:
-                d = drSetting['active']
+            if 'active' in setting:
+                d = setting['active']
     
                 for activeSymbol, symbol in d.items():
                     self.activeTable.insertRow(0)

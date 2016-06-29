@@ -142,8 +142,8 @@ class MainEngine(object):
     def sendOrder(self, orderReq, gatewayName):
         """对特定接口发单"""
         # 如果风控检查失败则不发单
-        if not self.rmEngine.checkRisk(orderReq):
-            return ''    
+        # if not self.rmEngine.checkRisk(orderReq):
+        #     return ''
         
         if gatewayName in self.gatewayDict:
             gateway = self.gatewayDict[gatewayName]
@@ -198,6 +198,7 @@ class MainEngine(object):
         log.logContent = content
         event = Event(type_=EVENT_LOG)
         event.dict_['data'] = log
+        print content
         self.eventEngine.put(event)        
     
     #----------------------------------------------------------------------
@@ -208,12 +209,7 @@ class MainEngine(object):
             host, port = loadMongoSetting()
                 
             try:
-                # 设置MongoDB操作的超时时间为0.5秒
-                self.dbClient = MongoClient(host, port, serverSelectionTimeoutMS=500)
-                
-                # 调用server_info查询服务器状态，防止服务器异常并未连接成功
-                self.dbClient.server_info()
-
+                self.dbClient = MongoClient(host, port)
                 self.writeLog(u'MongoDB连接成功')
             except ConnectionFailure:
                 self.writeLog(u'MongoDB连接失败')

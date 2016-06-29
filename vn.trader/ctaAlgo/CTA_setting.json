@@ -3,5 +3,15 @@
         "name": "double ema",
         "className": "DoubleEmaDemo",
         "vtSymbol": "IF1602"
+    },
+    {
+        "name": "momentum",
+        "className": "MomentumDemo",
+        "vtSymbol": "IF1606"
+    },
+    {
+        "name": "atrrsi",
+        "className": "AtrRsi",
+        "vtSymbol": "IF1606"
     }
 ]

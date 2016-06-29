@@ -17,11 +17,10 @@ class RmSpinBox(QtGui.QSpinBox):
     def __init__(self, value):
         """Constructor"""
         super(RmSpinBox, self).__init__()
-
+        self.setValue(value)
+        
         self.setMinimum(0)
         self.setMaximum(1000000)
-        
-        self.setValue(value)
     
     
 
@@ -108,7 +107,6 @@ class RmEngineManager(QtGui.QWidget):
         self.spinOrderFlowClear.valueChanged.connect(self.rmEngine.setOrderFlowClear)
         self.spinOrderSizeLimit.valueChanged.connect(self.rmEngine.setOrderSizeLimit)
         self.spinTradeLimit.valueChanged.connect(self.rmEngine.setTradeLimit)
-        self.spinWorkingOrderLimit.valueChanged.connect(self.rmEngine.setWorkingOrderLimit)
         
         self.buttonSwitchEngineStatus.clicked.connect(self.switchEngineSatus)
         buttonClearOrderFlowCount.clicked.connect(self.rmEngine.clearOrderFlowCount)
