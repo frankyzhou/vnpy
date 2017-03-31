@@ -13,7 +13,7 @@ class MomentumDemo(CtaTemplate):
     initDays = 10   # 初始化数据所用的天数
     obverstion = 60 * 5 # 时间窗口
     overflow = 0.045 # 浮动幅度
-    hand  = 35 # 最高手数
+    hand  = 10 # 最高手数
 
     # 策略变量
     bar = None
@@ -132,3 +132,35 @@ class MomentumDemo(CtaTemplate):
         """收到成交推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
         pass
+
+if __name__ == '__main__':
+    # 提供直接双击回测的功能
+    # 导入PyQt4的包是为了保证matplotlib使用PyQt4而不是PySide，防止初始化出错
+    from ctaBacktesting import *
+    from PyQt4 import QtCore, QtGui
+
+    # 创建回测引擎
+    engine = BacktestingEngine()
+
+    # 设置引擎的回测模式为K线
+    engine.setBacktestingMode(engine.BAR_MODE)
+
+    # 设置回测用的数据起始日期
+    engine.setStartDate('20120101')
+
+    # 载入历史数据到引擎中
+    engine.loadHistoryData(MINUTE_DB_NAME, 'IF0000')
+
+    # 设置产品相关参数
+    engine.setSlippage(0.2)     # 股指1跳
+    engine.setRate(0.3/10000)   # 万0.3
+    engine.setSize(300)         # 股指合约大小
+
+    # 在引擎中创建策略对象
+    engine.initStrategy(MomentumDemo, {})
+
+    # 开始跑回测
+    engine.runBacktesting()
+
+    # 显示回测结果
+    engine.showBacktestingResult()

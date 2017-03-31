@@ -22,14 +22,13 @@ import numpy as np
 class AtrRsiStrategy(CtaTemplate):
     """结合ATR和RSI指标的一个分钟线交易策略"""
     className = 'AtrRsiStrategy'
-    author = u'用Python的交易员'
 
     # 策略参数
     atrLength = 22          # 计算ATR指标的窗口数   
     atrMaLength = 10        # 计算ATR均线的窗口数
     rsiLength = 5           # 计算RSI的窗口数
     rsiEntry = 16           # RSI的开仓信号
-    trailingPercent = 0.8   # 百分比移动止损
+    trailingPercent = 0.9  # 百分比移动止损
     initDays = 10           # 初始化数据所用的天数
 
     # 策略变量
@@ -54,7 +53,7 @@ class AtrRsiStrategy(CtaTemplate):
     intraTradeLow = 0                   # 移动止损用的持仓期内最低价
 
     orderList = []                      # 保存委托代码的列表
-
+    unit_size = 1
     # 参数列表，保存了参数的名称
     paramList = ['name',
                  'className',
@@ -184,6 +183,7 @@ class AtrRsiStrategy(CtaTemplate):
         
         # 当前无仓位
         if self.pos == 0:
+            print "empty" + str(bar.datetime)
             self.intraTradeHigh = bar.high
             self.intraTradeLow = bar.low
 
@@ -193,32 +193,34 @@ class AtrRsiStrategy(CtaTemplate):
                 # 使用RSI指标的趋势行情时，会在超买超卖区钝化特征，作为开仓信号
                 if self.rsiValue > self.rsiBuy:
                     # 这里为了保证成交，选择超价5个整指数点下单
-                    self.buy(bar.close+5, 1)
+                    self.buy(bar.close+5, self.unit_size)
                     return
 
                 if self.rsiValue < self.rsiSell:
-                    self.short(bar.close-5, 1)
+                    self.short(bar.close-5, self.unit_size)
                     return
 
         # 持有多头仓位
         if self.pos == 1:
+            print "positive" + str(bar.datetime)
             # 计算多头持有期内的最高价，以及重置最低价
             self.intraTradeHigh = max(self.intraTradeHigh, bar.high)
             self.intraTradeLow = bar.low
             # 计算多头移动止损
             longStop = self.intraTradeHigh * (1-self.trailingPercent/100)
             # 发出本地止损委托，并且把委托号记录下来，用于后续撤单
-            orderID = self.sell(longStop, 1, stop=True)
+            orderID = self.sell(longStop, self.unit_size, stop=True)
             self.orderList.append(orderID)
             return
 
         # 持有空头仓位
         if self.pos == -1:
+            print "negative" + str(bar.datetime)
             self.intraTradeLow = min(self.intraTradeLow, bar.low)
             self.intraTradeHigh = bar.high
 
             shortStop = self.intraTradeLow * (1+self.trailingPercent/100)
-            orderID = self.cover(shortStop, 1, stop=True)
+            orderID = self.cover(shortStop, self.unit_size, stop=True)
             self.orderList.append(orderID)
             return
 

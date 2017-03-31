@@ -549,8 +549,8 @@ if __name__ == '__main__':
     # 建议使用ipython notebook或者spyder来做回测
     # 同样可以在命令模式下进行回测（一行一行输入运行）
     # from ctaDemo import *
-    from MomentumDemo import *
-
+    # from MomentumDemo import *
+    from strategyAtrRsi import *
     # 创建回测引擎
     engine = BacktestingEngine()
     
@@ -558,8 +558,8 @@ if __name__ == '__main__':
     engine.setBacktestingMode(engine.BAR_MODE)
 
     # 设置回测用的数据起始日期
-    engine.setStartDate('20110101')
-    
+    engine.setStartDate('20120101')
+    engine.setEndDate('20160501')
     # 载入历史数据到引擎中
     engine.loadHistoryData(MINUTE_DB_NAME, 'IF0000')
     
@@ -569,7 +569,7 @@ if __name__ == '__main__':
     engine.setSize(300)         # 股指合约大小    
     
     # 在引擎中创建策略对象
-    engine.initStrategy(MomentumDemo, {})
+    engine.initStrategy(AtrRsiStrategy, {})
     
     # 开始跑回测
     engine.runBacktesting()
