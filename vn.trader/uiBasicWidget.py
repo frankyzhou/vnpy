@@ -2,6 +2,7 @@
 
 import json
 import csv
+import os
 from collections import OrderedDict
 
 from PyQt4 import QtGui, QtCore
@@ -14,8 +15,12 @@ from vtGateway import *
 #----------------------------------------------------------------------
 def loadFont():
     """载入字体设置"""
+    fileName = 'VT_setting.json'
+    path = os.path.abspath(os.path.dirname(__file__)) 
+    fileName = os.path.join(path, fileName)  
+    
     try:
-        f = file("VT_setting.json")
+        f = file(fileName)
         setting = json.load(f)
         family = setting['fontFamily']
         size = setting['fontSize']
@@ -49,6 +54,31 @@ class BasicCell(QtGui.QTableWidgetItem):
 
 
 ########################################################################
+class NumCell(QtGui.QTableWidgetItem):
+    """用来显示数字的单元格"""
+
+    #----------------------------------------------------------------------
+    def __init__(self, text=None, mainEngine=None):
+        """Constructor"""
+        super(NumCell, self).__init__()
+        self.data = None
+        if text:
+            self.setContent(text)
+    
+    #----------------------------------------------------------------------
+    def setContent(self, text):
+        """设置内容"""
+        # 考虑到NumCell主要用来显示OrderID和TradeID之类的整数字段，
+        # 这里的数据转化方式使用int类型。但是由于部分交易接口的委托
+        # 号和成交号可能不是纯数字的形式，因此补充了一个try...except
+        try:
+            num = int(text)
+            self.setData(QtCore.Qt.DisplayRole, num)
+        except ValueError:
+            self.setText(text)
+            
+
+########################################################################
 class DirectionCell(QtGui.QTableWidgetItem):
     """用来显示买卖方向的单元格"""
 
@@ -67,24 +97,6 @@ class DirectionCell(QtGui.QTableWidgetItem):
             self.setForeground(QtGui.QColor('red'))
         elif text == DIRECTION_SHORT:
             self.setForeground(QtGui.QColor('green'))
-        self.setText(text)
-
-
-########################################################################
-class NameCell(QtGui.QTableWidgetItem):
-    """用来显示合约中文名的单元格"""
-
-    #----------------------------------------------------------------------
-    def __init__(self, text=None, mainEngine=None):
-        """Constructor"""
-        super(NameCell, self).__init__()
-        self.data = None
-        if text:
-            self.setContent(text)
-    
-    #----------------------------------------------------------------------
-    def setContent(self, text):
-        """设置内容"""
         self.setText(text)
 
 
@@ -276,7 +288,7 @@ class BasicMonitor(QtGui.QTableWidget):
             if key not in self.dataDict:
                 self.insertRow(0)     
                 d = {}
-                for n, header in enumerate(self.headerList):
+                for n, header in enumerate(self.headerList):                  
                     content = safeUnicode(data.__getattribute__(header))
                     cellType = self.headerDict[header]['cellType']
                     cell = cellType(content, self.mainEngine)
@@ -311,10 +323,10 @@ class BasicMonitor(QtGui.QTableWidget):
                 if self.font:
                     cell.setFont(self.font)
 
-                if self.saveData:            
+                if self.saveData:
                     cell.data = data                
 
-                self.setItem(0, n, cell)            
+                self.setItem(0, n, cell)                        
                 
         # 调整列宽
         self.resizeColumns()
@@ -458,10 +470,10 @@ class ErrorMonitor(BasicMonitor):
         """Constructor"""
         super(ErrorMonitor, self).__init__(mainEngine, eventEngine, parent)
         
-        d = OrderedDict()        
+        d = OrderedDict()       
+        d['errorTime']  = {'chinese':u'错误时间', 'cellType':BasicCell}
         d['errorID'] = {'chinese':u'错误代码', 'cellType':BasicCell}
         d['errorMsg'] = {'chinese':u'错误信息', 'cellType':BasicCell}
-        d['additionalInfo'] = {'chinese':u'补充信息', 'cellType':BasicCell}
         d['gatewayName'] = {'chinese':u'接口', 'cellType':BasicCell}
         self.setHeaderDict(d)
         
@@ -481,8 +493,8 @@ class TradeMonitor(BasicMonitor):
         super(TradeMonitor, self).__init__(mainEngine, eventEngine, parent)
         
         d = OrderedDict()
-        d['tradeID'] = {'chinese':u'成交编号', 'cellType':BasicCell}
-        d['orderID'] = {'chinese':u'委托编号', 'cellType':BasicCell}
+        d['tradeID'] = {'chinese':u'成交编号', 'cellType':NumCell}
+        d['orderID'] = {'chinese':u'委托编号', 'cellType':NumCell}
         d['symbol'] = {'chinese':u'合约代码', 'cellType':BasicCell}
         d['vtSymbol'] = {'chinese':u'名称', 'cellType':NameCell}
         d['direction'] = {'chinese':u'方向', 'cellType':DirectionCell}
@@ -495,6 +507,8 @@ class TradeMonitor(BasicMonitor):
         
         self.setEventType(EVENT_TRADE)
         self.setFont(BASIC_FONT)
+        self.setSorting(True)
+        
         self.initTable()
         self.registerEvent()
 
@@ -511,7 +525,7 @@ class OrderMonitor(BasicMonitor):
         self.mainEngine = mainEngine
         
         d = OrderedDict()
-        d['orderID'] = {'chinese':u'委托编号', 'cellType':BasicCell}
+        d['orderID'] = {'chinese':u'委托编号', 'cellType':NumCell}
         d['symbol'] = {'chinese':u'合约代码', 'cellType':BasicCell}
         d['vtSymbol'] = {'chinese':u'名称', 'cellType':NameCell}
         d['direction'] = {'chinese':u'方向', 'cellType':DirectionCell}
@@ -531,10 +545,10 @@ class OrderMonitor(BasicMonitor):
         self.setEventType(EVENT_ORDER)
         self.setFont(BASIC_FONT)
         self.setSaveData(True)
+        self.setSorting(True)
         
         self.initTable()
         self.registerEvent()
-        
         self.connectSignal()
         
     #----------------------------------------------------------------------
@@ -573,6 +587,7 @@ class PositionMonitor(BasicMonitor):
         d['ydPosition'] = {'chinese':u'昨持仓', 'cellType':BasicCell}
         d['frozen'] = {'chinese':u'冻结量', 'cellType':BasicCell}
         d['price'] = {'chinese':u'价格', 'cellType':BasicCell}
+        d['positionProfit'] = {'chinese':u'持仓盈亏', 'cellType':BasicCell}
         d['gatewayName'] = {'chinese':u'接口', 'cellType':BasicCell}
         self.setHeaderDict(d)
         
@@ -640,12 +655,17 @@ class TradingWidget(QtGui.QFrame):
                     EXCHANGE_SZSE,
                     EXCHANGE_SGE,
                     EXCHANGE_HKEX,
+                    EXCHANGE_HKFE,
                     EXCHANGE_SMART,
+                    EXCHANGE_ICE,
+                    EXCHANGE_CME,
+                    EXCHANGE_NYMEX,
                     EXCHANGE_GLOBEX,
                     EXCHANGE_IDEALPRO]
     
     currencyList = [CURRENCY_NONE,
                     CURRENCY_CNY,
+                    CURRENCY_HKD,
                     CURRENCY_USD]
     
     productClassList = [PRODUCT_NONE,
@@ -666,7 +686,7 @@ class TradingWidget(QtGui.QFrame):
         self.symbol = ''
         
         # 添加交易接口
-        self.gatewayList.extend(mainEngine.gatewayDict.keys())
+        self.gatewayList.extend(mainEngine.getAllGatewayNames())
 
         self.initUi()
         self.connectSignal()
@@ -685,6 +705,7 @@ class TradingWidget(QtGui.QFrame):
         labelDirection = QtGui.QLabel(u'方向类型')
         labelOffset = QtGui.QLabel(u'开平')
         labelPrice = QtGui.QLabel(u'价格')
+        self.checkFixed = QtGui.QCheckBox(u'')  # 价格固定选择框
         labelVolume = QtGui.QLabel(u'数量')
         labelPriceType = QtGui.QLabel(u'价格类型')
         labelExchange = QtGui.QLabel(u'交易所') 
@@ -738,17 +759,18 @@ class TradingWidget(QtGui.QFrame):
         gridleft.addWidget(labelProductClass, 9, 0)   
         gridleft.addWidget(labelGateway, 10, 0)
         
-        gridleft.addWidget(self.lineSymbol, 0, 1)
-        gridleft.addWidget(self.lineName, 1, 1)
-        gridleft.addWidget(self.comboDirection, 2, 1)
-        gridleft.addWidget(self.comboOffset, 3, 1)
-        gridleft.addWidget(self.spinPrice, 4, 1)
-        gridleft.addWidget(self.spinVolume, 5, 1)
-        gridleft.addWidget(self.comboPriceType, 6, 1)	
-        gridleft.addWidget(self.comboExchange, 7, 1)
-        gridleft.addWidget(self.comboCurrency, 8, 1)	
-        gridleft.addWidget(self.comboProductClass, 9, 1) 
-        gridleft.addWidget(self.comboGateway, 10, 1)
+        gridleft.addWidget(self.lineSymbol, 0, 1, 1, -1)
+        gridleft.addWidget(self.lineName, 1, 1, 1, -1)
+        gridleft.addWidget(self.comboDirection, 2, 1, 1, -1)
+        gridleft.addWidget(self.comboOffset, 3, 1, 1, -1)
+        gridleft.addWidget(self.checkFixed, 4, 1)
+        gridleft.addWidget(self.spinPrice, 4, 2)
+        gridleft.addWidget(self.spinVolume, 5, 1, 1, -1)
+        gridleft.addWidget(self.comboPriceType, 6, 1, 1, -1)
+        gridleft.addWidget(self.comboExchange, 7, 1, 1, -1)
+        gridleft.addWidget(self.comboCurrency, 8, 1, 1, -1)
+        gridleft.addWidget(self.comboProductClass, 9, 1, 1, -1)
+        gridleft.addWidget(self.comboGateway, 10, 1, 1, -1)
 
         # 右边部分
         labelBid1 = QtGui.QLabel(u'买一')
@@ -917,7 +939,10 @@ class TradingWidget(QtGui.QFrame):
         req.exchange = exchange
         req.currency = currency
         req.productClass = productClass
-        
+
+        # 默认跟随价
+        self.checkFixed.setChecked(False)
+
         self.mainEngine.subscribe(req, gatewayName)
 
         # 更新组件当前交易的合约
@@ -929,6 +954,8 @@ class TradingWidget(QtGui.QFrame):
         tick = event.dict_['data']
 
         if tick.vtSymbol == self.symbol:
+            if not self.checkFixed.isChecked():
+                self.spinPrice.setValue(tick.lastPrice)
             self.labelBidPrice1.setText(str(tick.bidPrice1))
             self.labelAskPrice1.setText(str(tick.askPrice1))
             self.labelBidVolume1.setText(str(tick.bidVolume1))

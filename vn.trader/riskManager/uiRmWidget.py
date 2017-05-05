@@ -17,11 +17,11 @@ class RmSpinBox(QtGui.QSpinBox):
     def __init__(self, value):
         """Constructor"""
         super(RmSpinBox, self).__init__()
-        self.setValue(value)
-        
+
         self.setMinimum(0)
         self.setMaximum(1000000)
-    
+
+        self.setValue(value)
     
 
 
@@ -67,7 +67,8 @@ class RmEngineManager(QtGui.QWidget):
         self.spinOrderSizeLimit = RmSpinBox(self.rmEngine.orderSizeLimit)
         self.spinTradeLimit = RmSpinBox(self.rmEngine.tradeLimit)
         self.spinWorkingOrderLimit = RmSpinBox(self.rmEngine.workingOrderLimit)
-        
+        self.spinOrderCancelLimit = RmSpinBox(self.rmEngine.orderCancelLimit)
+
         buttonClearOrderFlowCount = QtGui.QPushButton(u'清空流控计数')
         buttonClearTradeCount = QtGui.QPushButton(u'清空总成交计数')
         buttonSaveSetting = QtGui.QPushButton(u'保存设置')
@@ -90,7 +91,10 @@ class RmEngineManager(QtGui.QWidget):
         grid.addWidget(RmLine(), 8, 0, 1, 2)
         grid.addWidget(Label(u'活动订单上限'), 9, 0)
         grid.addWidget(self.spinWorkingOrderLimit, 9, 1)
-        
+        grid.addWidget(RmLine(), 10, 0, 1, 2)
+        grid.addWidget(Label(u'单合约撤单上限'), 11, 0)
+        grid.addWidget(self.spinOrderCancelLimit, 11, 1)
+
         hbox = QtGui.QHBoxLayout()
         hbox.addWidget(buttonClearOrderFlowCount)
         hbox.addWidget(buttonClearTradeCount)
@@ -107,7 +111,10 @@ class RmEngineManager(QtGui.QWidget):
         self.spinOrderFlowClear.valueChanged.connect(self.rmEngine.setOrderFlowClear)
         self.spinOrderSizeLimit.valueChanged.connect(self.rmEngine.setOrderSizeLimit)
         self.spinTradeLimit.valueChanged.connect(self.rmEngine.setTradeLimit)
-        
+        self.spinWorkingOrderLimit.valueChanged.connect(self.rmEngine.setWorkingOrderLimit)
+        self.spinOrderCancelLimit.valueChanged.connect(self.rmEngine.setOrderCancelLimit)
+
+
         self.buttonSwitchEngineStatus.clicked.connect(self.switchEngineSatus)
         buttonClearOrderFlowCount.clicked.connect(self.rmEngine.clearOrderFlowCount)
         buttonClearTradeCount.clicked.connect(self.rmEngine.clearTradeCount)

@@ -62,15 +62,26 @@ EXCHANGE_SGE = 'SGE'       # 上金所
 EXCHANGE_UNKNOWN = 'UNKNOWN'# 未知交易所
 EXCHANGE_NONE = ''          # 空交易所
 EXCHANGE_HKEX = 'HKEX'      # 港交所
+EXCHANGE_HKFE = 'HKFE'      # 香港期货交易所
 
 EXCHANGE_SMART = 'SMART'       # IB智能路由（股票、期权）
 EXCHANGE_GLOBEX = 'GLOBEX'     # CME电子交易平台
 EXCHANGE_IDEALPRO = 'IDEALPRO' # IB外汇ECN
 
+EXCHANGE_CME = 'CME'           # CME交易所
+EXCHANGE_ICE = 'ICE'           # ICE交易所
+
 EXCHANGE_OANDA = 'OANDA'       # OANDA外汇做市商
+EXCHANGE_OKCOIN = 'OKCOIN'     # OKCOIN比特币交易所
+EXCHANGE_HUOBI = 'HUOBI'       # 火币比特币交易所
+EXCHANGE_LHANG = 'LHANG'       # 链行比特币交易所
 
 # 货币类型
 CURRENCY_USD = 'USD'            # 美元
 CURRENCY_CNY = 'CNY'            # 人民币
+CURRENCY_HKD = 'HKD'            # 港币
 CURRENCY_UNKNOWN = 'UNKNOWN'    # 未知货币
 CURRENCY_NONE = ''              # 空货币
+
+# 数据库
+LOG_DB_NAME = 'VnTrader_Log_Db'
