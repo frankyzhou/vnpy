@@ -903,6 +903,8 @@ if __name__ == '__main__':
     # 建议使用ipython notebook或者spyder来做回测
     # 同样可以在命令模式下进行回测（一行一行输入运行）
     from strategy.strategyEmaDemo import *
+    from strategy.strategyKingKeltner import  *
+    from strategy.strategyAtrRsi import *
 
     # 创建回测引擎
     engine = BacktestingEngine()
@@ -922,7 +924,7 @@ if __name__ == '__main__':
     engine.setSize(300)         # 股指合约大小    
     
     # 在引擎中创建策略对象
-    engine.initStrategy(EmaDemoStrategy, {})
+    engine.initStrategy(AtrRsiStrategy, {})
     
     # 开始跑回测
     engine.runBacktesting()

@@ -399,7 +399,7 @@ class CtaEngine(object):
                 req.exchange = contract.exchange
                 
                 # 对于IB接口订阅行情时所需的货币和产品类型，从策略属性中获取
-                req.currency = strategy.currency
+                # req.currency = strategy.currency
                 req.productClass = strategy.productClass
                 
                 self.mainEngine.subscribe(req, contract.gatewayName)
